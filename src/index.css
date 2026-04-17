@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Startup Brand Colors */
+  --color-brand-primary: #3B82F6;
+  --color-brand-secondary: #10B981;
+  --color-brand-accent: #8B5CF6;
+  
+  --color-bg-main: #0F172A;
+  --color-bg-card: #1E293B;
+  --color-border-subtle: #334155;
+  
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-main text-text-primary font-sans antialiased;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-bg-card/50 backdrop-blur-xl border border-border-subtle rounded-2xl;
+  }
+  
+  .btn-primary {
+    @apply bg-brand-primary hover:bg-brand-primary/90 text-white font-semibold py-2 px-6 rounded-lg transition-all active:scale-95 disabled:opacity-50;
+  }
+
+  .btn-outline {
+    @apply border border-border-subtle hover:bg-white/5 text-text-primary font-semibold py-2 px-6 rounded-lg transition-all;
+  }
+
+  .input-error {
+    @apply border-red-500 focus:ring-red-500/20 shadow-[0_0_0_1px_rgba(239,68,68,0.2)];
+  }
+
+  .text-error {
+    @apply text-red-500 text-[10px] font-bold mt-1 flex items-center gap-1;
+  }
+}
+
+/* Custom transitions and scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-bg-main;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-border-subtle rounded-full border-2 border-bg-main;
+}

@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "followedTopics": { "type": "array", "items": { "type": "string" } },
+        "favorites": { "type": "array", "items": { "type": "string" } },
+        "xp": { "type": "number", "description": "Experience points for gamification" },
+        "level": { "type": "number", "description": "User's calculated level" }
+      },
+      "required": ["uid", "displayName", "role"]
+    },
+    "SearchLog": {
+      "title": "SearchLog",
+      "description": "Log of user searches for analytics",
+      "type": "object",
+      "properties": {
+        "query": { "type": "string" },
+        "userId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "resultsCount": { "type": "number" }
+      },
+      "required": ["query", "timestamp", "resultsCount"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "Programming course metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "platform": { "type": "string" },
+        "level": { "type": "string", "enum": ["Iniciante", "Intermediário", "Avançado"] },
+        "category": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["title", "url", "platform", "level"]
+    },
+    "Rating": {
+      "title": "Rating",
+      "description": "User rating for a course",
+      "type": "object",
+      "properties": {
+        "courseUrl": { "type": "string" },
+        "userId": { "type": "string" },
+        "rating": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["courseUrl", "userId", "rating", "timestamp"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "User review for a course",
+      "type": "object",
+      "properties": {
+        "courseUrl": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["courseUrl", "userId", "userName", "text", "timestamp"]
+    },
+    "StudyProgress": {
+      "title": "StudyProgress",
+      "description": "User progress in a course",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "courseUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["started", "completed"] },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "courseUrl", "status", "lastUpdated"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Alert for new courses or progress",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "topic": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "isRead", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Store application users"
+    },
+    "/ratings/{ratingId}": {
+      "schema": "Rating",
+      "description": "Store user ratings for courses"
+    },
+    "/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Store user reviews for courses"
+    },
+    "/progress/{progressId}": {
+      "schema": "StudyProgress",
+      "description": "Store study status"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Store user notifications"
+    },
+    "/searches/{searchId}": {
+      "schema": "SearchLog",
+      "description": "Store search logs for analytics"
+    }
+  }
+}
