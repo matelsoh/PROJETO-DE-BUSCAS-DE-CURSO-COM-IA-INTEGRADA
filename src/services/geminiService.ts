@@ -7,7 +7,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { CourseResult, RoadmapStep } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-const MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = "gemini-3-flash-preview";
 
 export async function searchCourses(query: string): Promise<CourseResult[]> {
   const prompt = `
@@ -51,52 +51,24 @@ export async function searchCourses(query: string): Promise<CourseResult[]> {
             required: ["title", "url", "platform", "level", "category", "description"],
           },
         },
-        tools: [
-          {
-            googleSearch: {},
-          },
-        ],
       },
     });
 
     const responseText = response.text || "[]";
     return JSON.parse(responseText.trim());
   } catch (error: any) {
-    console.warn("Search with Google Search tool failed, falling back to direct generation...", error);
+    console.error("Gemini Search failed", error);
     
-    // Fallback: If 403 (Permission Denied for tool) or other error, retry without Google Search tool
-    try {
-      const fallbackResponse = await ai.models.generateContent({
-        model: MODEL_NAME,
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                title: { type: Type.STRING },
-                url: { type: Type.STRING },
-                platform: { type: Type.STRING },
-                level: { 
-                  type: Type.STRING, 
-                  enum: ['Iniciante', 'Intermediário', 'Avançado'] 
-                },
-                category: { type: Type.STRING },
-                description: { type: Type.STRING },
-              },
-              required: ["title", "url", "platform", "level", "category", "description"],
-            },
-          },
-        },
-      });
-      const text = fallbackResponse.text || "[]";
-      return JSON.parse(text.trim());
-    } catch (e) {
-      console.error("Search failed completely", e);
-      return [];
+    // Check for specific error codes
+    if (error?.message?.includes('403') || error?.status === 403) {
+      throw new Error("Erro de Permissão (403): Verifique se você selecionou uma chave de API válida no menu lateral do AI Studio.");
     }
+    
+    if (error?.message?.includes('404') || error?.status === 404) {
+      throw new Error("Erro de Modelo (404): O modelo solicitado não foi encontrado. Tente selecionar o modelo 'Gemini 3 Flash' nas configurações.");
+    }
+    
+    return [];
   }
 }
 
