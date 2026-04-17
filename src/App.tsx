@@ -12,7 +12,7 @@ import {
   Search, BookOpen, Star, MessageSquare, Send, X, LogIn, LogOut, 
   User as UserIcon, Bell, Inbox, Heart, Sparkles, Map, 
   ChevronRight, Award, Clock, Terminal, Globe, Brain, Database,
-  Cpu, Layout, CheckCircle2, Circle, Loader2, ExternalLink, Share2, Shield, Users, Eye, Info, AlertCircle, Coffee
+  Cpu, Layout, CheckCircle2, Circle, Loader2, ExternalLink, Share2, Shield, Users, Eye, Info, AlertCircle, Coffee, Youtube
 } from 'lucide-react';
 
 interface ErrorBoundaryProps {
@@ -263,7 +263,8 @@ export default function App() {
     { name: "Mobile", icon: <Globe size={18} /> },
     { name: "IA & Ciência de Dados", icon: <Brain size={18} /> },
     { name: "Banco de Dados", icon: <Database size={18} /> },
-    { name: "Infra & Cloud", icon: <Cpu size={18} /> }
+    { name: "Infra & Cloud", icon: <Cpu size={18} /> },
+    { name: "YouTube", icon: <Youtube size={18} /> }
   ];
 
   const featuredPaths: LearningPath[] = [
@@ -1438,6 +1439,14 @@ function CourseDetailModal({ course, user, progress, cover, onGenerateCover, onU
     }
   };
 
+  const getYoutubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const youtubeId = getYoutubeId(course.url);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -1469,26 +1478,39 @@ function CourseDetailModal({ course, user, progress, cover, onGenerateCover, onU
         <div className="flex-grow overflow-y-auto grid grid-cols-1 lg:grid-cols-12">
           {/* Main Info */}
           <div className="lg:col-span-8 p-8 border-r border-border-subtle">
-            <div className="relative rounded-2xl overflow-hidden mb-8 h-64 bg-white/5 border border-border-subtle group/cover">
-              {cover ? (
-                <img src={cover} alt={course.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center opacity-20">
-                  <Sparkles size={64} className="mb-4 text-brand-primary" />
-                  <p className="text-xs uppercase font-bold tracking-widest text-text-muted">Sem Capa Gerada</p>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/cover:opacity-100 transition-all duration-300 flex items-center justify-center pointer-events-none group-hover/cover:pointer-events-auto">
-                <button 
-                  onClick={handleGenerateCover}
-                  disabled={isGeneratingCover}
-                  className="bg-brand-primary hover:bg-brand-primary/80 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-2xl transition-all active:scale-95 disabled:opacity-50"
-                >
-                  {isGeneratingCover ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
-                  {isGeneratingCover ? 'Gerando sua Capa...' : 'Gerar Capa com IA (Imagen)'}
-                </button>
+            {youtubeId ? (
+              <div className="relative rounded-2xl overflow-hidden mb-8 aspect-video bg-black shadow-2xl border border-border-subtle">
+                <iframe
+                  src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0&rel=0`}
+                  title={course.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                ></iframe>
               </div>
-            </div>
+            ) : (
+              <div className="relative rounded-2xl overflow-hidden mb-8 h-64 bg-white/5 border border-border-subtle group/cover">
+                {cover ? (
+                  <img src={cover} alt={course.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center opacity-20">
+                    <Sparkles size={64} className="mb-4 text-brand-primary" />
+                    <p className="text-xs uppercase font-bold tracking-widest text-text-muted">Sem Capa Gerada</p>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/cover:opacity-100 transition-all duration-300 flex items-center justify-center pointer-events-none group-hover/cover:pointer-events-auto">
+                  <button 
+                    onClick={handleGenerateCover}
+                    disabled={isGeneratingCover}
+                    className="bg-brand-primary hover:bg-brand-primary/80 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-2xl transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    {isGeneratingCover ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
+                    {isGeneratingCover ? 'Gerando sua Capa...' : 'Gerar Capa com IA (Imagen)'}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <h4 className="text-[11px] font-bold uppercase text-text-muted tracking-widest mb-4">Visão Geral</h4>
             <p className="text-text-secondary leading-relaxed mb-10">{course.description}</p>
